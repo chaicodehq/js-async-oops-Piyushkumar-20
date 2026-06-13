@@ -151,10 +151,10 @@ export function processMultipleOrders(orderList) {
   if (Array.isArray(orderList) && orderList.length === 0) {
     return Promise.resolve([]);
   }
-  const promises = orderList.map((order) => 
+  const promises = orderList.map((order) =>
     processDelivery(order.restaurant, order.items)
       .then((result) => ({ status: "fulfilled", value: result }))
-      .catch((error) => ({ status: "rejected", reason: error.message }))
+      .catch((error) => ({ status: "rejected", reason: error.message })),
   );
 
   return Promise.all(promises);

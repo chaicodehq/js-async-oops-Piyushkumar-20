@@ -124,54 +124,114 @@ export class TempleQueue {
   #vipEnabled;
 
   constructor(templeName, maxCapacity) {
-    // Your code here
+    ((this.templeName = templeName),
+      (this.#devotees = []),
+      (this.#maxCapacity = maxCapacity > 0 ? maxCapacity : 100));
+    this.#vipEnabled = false;
   }
 
   get length() {
-    // Your code here
+    return this.#devotees.length;
   }
 
   get isEmpty() {
-    // Your code here
+    return this.#devotees.length === 0;
   }
 
   get vipEnabled() {
-    // Your code here
+    return this.#vipEnabled;
   }
 
   set vipEnabled(value) {
-    // Your code here
+    if (typeof value !== "boolean") {
+      throw TypeError("VIP status must be a boolean");
+    }
+    this.#vipEnabled = value;
   }
 
   enqueue(name, type) {
-    // Your code here
+    const types = ["regular", "vip"];
+    if (!types.includes(type) || !name || name.length === 0) {
+      return null;
+    }
+    if (this.#devotees.length >= this.#maxCapacity) {
+      return null;
+    }
+    const devotee = {
+      name,
+      type,
+      joinedAt: new Date().toISOString(),
+    };
+
+    if (type === "vip" && this.#vipEnabled === true) {
+      this.#devotees.unshift(devotee);
+    } else if (type === "vip") {
+      this.#devotees.push(devotee);
+    } else {
+      this.#devotees.push(devotee);
+    }
+    return devotee;
   }
 
   dequeue() {
-    // Your code here
+    if (this.#devotees.length === 0) {
+      return null;
+    }
+    return this.#devotees.shift();
   }
 
   peek() {
-    // Your code here
+    if (this.#devotees.length === 0) {
+      return null;
+    }
+    return this.#devotees[0];
   }
 
   contains(name) {
-    // Your code here
+    for (const devotee of this.#devotees) {
+      if (devotee.name === name) {
+        return true;
+      }
+    }
+    return false;
   }
 
   toArray() {
-    // Your code here
+    return [...this.#devotees];
   }
 
   static merge(queue1, queue2) {
-    // Your code here
+    const maxCapacity = queue1.toArray().length + queue2.toArray().length;
+    const mergedQueue = new TempleQueue(
+      `${queue1.templeName}-${queue2.templeName}`, maxCapacity
+    );
+
+    for (const devotee of queue1.toArray()) {
+      mergedQueue.enqueue(devotee.name, devotee.type);
+    }
+
+    for (const devotee of queue2.toArray()) {
+      mergedQueue.enqueue(devotee.name, devotee.type);
+    }
+
+    return mergedQueue;
   }
 
   static fromArray(templeName, maxCapacity, arr) {
-    // Your code here
+    const queue = new TempleQueue(templeName, maxCapacity);
+    if (!Array.isArray(arr)) {
+      return queue;
+    }
+
+    for (const name of arr) {
+      queue.enqueue(name, "regular");
+    }
+    return queue;
   }
 
-  [Symbol.iterator]() {
-    // Your code here
+  *[Symbol.iterator]() {
+    for (const devotee of this.#devotees){
+      yield devotee
+    }
   }
 }
